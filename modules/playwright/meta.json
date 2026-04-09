@@ -1,0 +1,7 @@
+{
+  "name": "playwright",
+  "description": "Playwright MCP server + E2E testing skill and command",
+  "mcpScope": "project",
+  "requiresEnv": [],
+  "setupPrompt": null
+}

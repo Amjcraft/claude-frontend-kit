@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "scope": "project"
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["-y", "shadcn@latest", "mcp"],
+      "env": {
+        "SHADCN_REGISTRY_URL": "${SHADCN_REGISTRY_URL}"
+      },
+      "scope": "project"
+    }
+  }
+}

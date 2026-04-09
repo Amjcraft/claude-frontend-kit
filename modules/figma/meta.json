@@ -1,0 +1,7 @@
+{
+  "name": "figma",
+  "description": "Figma MCP server + design handoff skill",
+  "mcpScope": "user",
+  "requiresEnv": ["FIGMA_ACCESS_TOKEN"],
+  "setupPrompt": "Enter your Figma personal access token (Settings → Account → Personal access tokens):"
+}

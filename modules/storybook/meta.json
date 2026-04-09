@@ -1,0 +1,7 @@
+{
+  "name": "storybook",
+  "description": "Storybook skill and component documentation patterns",
+  "mcpScope": null,
+  "requiresEnv": [],
+  "setupPrompt": null
+}

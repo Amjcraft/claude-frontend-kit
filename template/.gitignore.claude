@@ -1,0 +1,3 @@
+# Claude Code personal overrides — do not commit
+CLAUDE.local.md
+.claude/settings.local.json

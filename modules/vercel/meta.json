@@ -1,0 +1,7 @@
+{
+  "name": "vercel",
+  "description": "Vercel MCP server for deployment and environment management",
+  "mcpScope": "user",
+  "requiresEnv": ["VERCEL_TOKEN"],
+  "setupPrompt": "Enter your Vercel personal access token (vercel.com/account/tokens):"
+}
