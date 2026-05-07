@@ -1,6 +1,10 @@
 ---
 name: storybook
 description: Storybook story authoring — CSF3 format, typed meta, argTypes for controls, story naming conventions, what to cover per component
+activation:
+  globs:
+    - "**/*.stories.tsx"
+    - "src/components/ui/**/*.tsx"
 ---
 
 # Storybook

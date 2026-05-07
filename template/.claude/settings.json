@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file=$(jq -r '.tool_input.file_path // empty'); if [[ \"$file\" =~ \\.(ts|tsx)$ ]]; then pnpm prettier --write \"$file\" 2>/dev/null || true; pnpm eslint --fix \"$file\" 2>/dev/null || true; if [ \"${CLAUDE_HOOKS_TYPECHECK-}\" = 1 ]; then pnpm tsc --noEmit; fi; fi"
+          }
+        ]
+      }
+    ]
+  }
+}

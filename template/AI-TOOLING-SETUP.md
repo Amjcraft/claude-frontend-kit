@@ -6,6 +6,7 @@ This project uses Claude Code with a shared configuration for consistent AI-assi
 
 - [Claude Code](https://claude.ai/code) installed: `npm install -g @anthropic-ai/claude-code`
 - pnpm installed: `npm install -g pnpm`
+- Docker installed (required for GitHub MCP)
 
 ## Project-Scoped Tools (automatic)
 
@@ -20,33 +21,68 @@ These require no setup — Claude Code starts them automatically.
 
 ## Personal Tools (one-time setup)
 
-Some tools require personal credentials and are installed at the user scope. Run the setup script once on your machine:
+Some tools require personal credentials and are installed at the user scope. Run the installer once on your machine from the toolkit repo:
 
 ```bash
-bash scripts/setup-user-tools.sh
+bash path/to/frontend-agent-toolkit/install.sh
 ```
 
-This will walk you through setting up:
-- **GitHub MCP** — PR and issue management from within Claude Code
+This walks you through setting up:
+- **GitHub MCP** — PR and issue management (requires GitHub PAT + Docker)
 - **Figma MCP** — Design file access (requires Figma personal access token)
 - **Vercel MCP** — Deployment management (requires Vercel token)
-- **Chrome DevTools MCP** — Browser debugging and inspection
+
+## Automatic Hooks
+
+Claude Code runs these hooks automatically after every file edit:
+
+- **prettier** — formats the file in place
+- **eslint --fix** — auto-fixes lint issues
+
+Both hooks run silently and never block. If a file can't be formatted, the hook exits cleanly.
+
+**Optional: TypeScript checking**
+
+To enable TypeScript type checking after every edit, set this in your shell:
+
+```bash
+export CLAUDE_HOOKS_TYPECHECK=1
+```
+
+This runs `pnpm tsc --noEmit` after each `.ts`/`.tsx` edit and surfaces errors in the same turn. Disabled by default — it's slow on large projects.
+
+To disable hooks entirely for a session, set `CLAUDE_SKIP_HOOKS=1` before launching Claude Code (note: this disables all hooks, not just formatting).
 
 ## Available Skills
 
-Claude Code will automatically pick up these project skills:
+Claude Code automatically loads these project skills:
 
-- **component-patterns** — Compound components, cva variants, hook extraction rules
-- **project-conventions** — Import ordering, path aliases, file creation checklists
+| Skill | Loaded when |
+|-------|-------------|
+| **component-patterns** | Always on — compound components, cva variants, hook extraction |
+| **project-conventions** | Always on — imports, path aliases, file structure, naming |
 
 ## Available Commands
 
-Type these in Claude Code to trigger specific workflows:
+| Command | Phase | Description |
+|---------|-------|-------------|
+| `/plan [feature]` | 0 | Investigate codebase, write a structured plan to `docs/plans/` |
+| `/execute-plan [name]` | 1 | Run a plan step-by-step with per-step verification |
+| `/generate-component` | 1 | Scaffold a component with tests, types, and barrel export |
+| `/cleanup [file]` | 2 | Accessibility, motion, design system, code quality |
+| `/polish [file or scope]` | 3 | Pre-PR audit: SEO, performance, responsiveness, test coverage |
+| `/investigate [question]` | Any | Answer a codebase question using a read-only subagent |
 
-| Command | Description |
-|---------|-------------|
-| `/design-review` | Audit a component against design system, a11y, and composition rules |
-| `/generate-component` | Scaffold a new component with tests, types, and barrel export |
+## Subagents
+
+Two subagents run in isolated contexts to keep the main session lean:
+
+| Agent | Invoked by | What it does |
+|-------|-----------|--------------|
+| **code-explorer** | `/plan`, `/investigate` | Read-only codebase investigation — never writes files |
+| **pr-reviewer** | `/polish` | Pre-ship audit against the full polish checklist |
+
+Delegate to `code-explorer` any time a question requires reading more than 5 files. Use `/investigate` as the shortcut.
 
 ## Personal Overrides
 
