@@ -1,3 +1,8 @@
+---
+name: storybook
+description: Storybook story authoring — CSF3 format, typed meta, argTypes for controls, story naming conventions, what to cover per component
+---
+
 # Storybook
 
 Guidance for writing and maintaining Storybook stories in this project.

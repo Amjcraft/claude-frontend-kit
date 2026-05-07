@@ -114,7 +114,6 @@ select_modules() {
   done
 
   while true; do
-    echo -e "\r\033[${#AVAILABLE_MODULES[@]}A"
     for i in "${!AVAILABLE_MODULES[@]}"; do
       local name="${AVAILABLE_MODULES[$i]}"
       local desc="${MODULE_DESCS[$i]}"
@@ -146,12 +145,6 @@ select_modules() {
     fi
   done
 }
-
-# Print initial state
-for i in "${!AVAILABLE_MODULES[@]}"; do
-  echo -e "  [ ] $((i + 1)). ${BOLD}${AVAILABLE_MODULES[$i]}${RESET} — ${DIM}${MODULE_DESCS[$i]}${RESET}"
-done
-echo ""
 
 select_modules
 
@@ -363,11 +356,25 @@ setup_user_mcp() {
 }
 
 # Always-installed user-scoped servers
-echo -e "  ${DIM}Setting up GitHub MCP (no token needed — uses your GitHub CLI auth)${RESET}"
-if [[ -n "$CLAUDE_CMD" ]]; then
-  claude mcp add --scope user github -- npx -y "@github/mcp-server@latest" &>/dev/null 2>&1 \
-    && print_ok "GitHub MCP installed" \
-    || print_warn "GitHub MCP: run 'gh auth login' first, then re-run this script"
+echo -e "  ${BOLD}GitHub MCP${RESET} ${DIM}(requires Docker + GitHub Personal Access Token)${RESET}"
+gh_token=""
+if [[ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]]; then
+  gh_token="$GITHUB_PERSONAL_ACCESS_TOKEN"
+  print_info "Using \$GITHUB_PERSONAL_ACCESS_TOKEN from environment"
+else
+  read -rsp "  GitHub Personal Access Token: " gh_token
+  echo ""
+fi
+if [[ -n "$CLAUDE_CMD" && -n "$gh_token" ]]; then
+  export GITHUB_PERSONAL_ACCESS_TOKEN="$gh_token"
+  if claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN -- docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN ghcr.io/github/github-mcp-server &>/dev/null 2>&1; then
+    print_ok "GitHub MCP installed"
+  else
+    print_warn "GitHub MCP: install failed — ensure Docker is running and your PAT is valid"
+  fi
+  unset GITHUB_PERSONAL_ACCESS_TOKEN
+elif [[ -z "$gh_token" ]]; then
+  print_warn "Skipping GitHub MCP — no token provided"
 fi
 
 # User-scoped servers from selected modules
@@ -408,14 +415,18 @@ for module in "${SELECTED_MODULES[@]}"; do
     local_args="$(jq -r ".[\"$local_server_name\"].args | join(\" \")" "$mcp_entry")"
     local_env_flag=""
     if [[ -n "$env_var" && -n "$token_val" ]]; then
-      local_env_flag="-e $env_var=$token_val"
+      export "$env_var=$token_val"
+      local_env_flag="-e $env_var"
     fi
 
+    # shellcheck disable=SC2086
     if claude mcp add --scope user $local_env_flag "$local_server_name" -- $local_cmd $local_args &>/dev/null 2>&1; then
       print_ok "$module_name MCP installed"
     else
       print_warn "$module_name MCP: install failed. Add manually if needed."
     fi
+
+    [[ -n "$env_var" ]] && unset "$env_var"
   fi
 done
 

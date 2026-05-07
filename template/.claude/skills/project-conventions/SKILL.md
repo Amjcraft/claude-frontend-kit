@@ -1,4 +1,5 @@
 ---
+name: project-conventions
 description: Project conventions — import ordering, path aliases (@/), file/folder structure checklists, naming conventions, env vars, error handling, shadcn/ui rules, Tailwind v4 CSS-first @theme approach
 ---
 

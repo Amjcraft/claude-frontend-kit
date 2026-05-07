@@ -2,26 +2,25 @@ Analyze the feature described in $ARGUMENTS and produce a structured implementat
 
 ---
 
-## Step 1 — Context Gathering (read-only)
+## Step 1 — Context Gathering (delegated to code-explorer)
 
-Before writing anything, scan the project to understand its current state:
+Use the `code-explorer` subagent to investigate the codebase. Pass it the feature description from $ARGUMENTS and ask it to map:
 
-- **Project structure** — routes (`src/app/`), components, hooks, lib utilities, types
-- **Data fetching pattern** — Server Components, TanStack Query, SWR, plain fetch? Look at existing pages and components to identify the established approach
-- **Auth pattern** — how is authentication handled? What session/user data is available and where?
-- **Form handling** — is react-hook-form used? Zod for validation? Look at existing forms
-- **Database / API layer** — ORM (Prisma, Drizzle)? Server actions or REST routes? Both?
-- **Email or external services** — any existing integrations relevant to this feature?
-- **Installed shadcn/ui components** — scan `src/components/ui/` to know what's already available
-- **Existing patterns to reuse** — components, hooks, utilities that this feature can build on
+- Project structure — routes (`src/app/`), components, hooks, lib utilities, types
+- Data fetching pattern — Server Components, TanStack Query, SWR, plain fetch?
+- Auth pattern — how is authentication handled, where does session/user data live?
+- Form handling — react-hook-form, Zod, server actions?
+- Database/API layer — ORM (Prisma, Drizzle)? Server actions or REST routes?
+- Installed shadcn/ui primitives — what's already in `src/components/ui/`?
+- Existing patterns this feature can reuse — components, hooks, utilities
 
-Do not propose a new approach if one already exists. Follow established project patterns.
+Do not gather context yourself. Delegate entirely to `code-explorer` and use its summary as the foundation for Steps 2 and 3.
 
 ---
 
 ## Step 2 — Feature Analysis
 
-Break the feature into discrete units of work:
+Using the code-explorer's findings, break the feature into discrete units of work:
 
 - Map each unit to **new files** (exact paths), **modified files** (exact paths), and **reusable existing components/hooks**
 - Identify **data requirements**: what data this feature needs, where it comes from, what new server actions or API routes are required
@@ -68,10 +67,16 @@ Decisions that need human input before implementation starts.
 How data moves through the feature — user action → server action or API → database → revalidation → UI update.
 
 ## Implementation Order
-Ordered sequence respecting dependency chains:
+Ordered sequence respecting dependency chains. Each step includes a verification criterion.
+
 1. Step one (e.g., database schema)
+   Done when: `pnpm prisma migrate dev` succeeds and `pnpm prisma generate` produces the typed client
+
 2. Step two (e.g., server actions)
-3. ...
+   Done when: calling the action from a test or the browser returns the expected shape with no TypeScript errors
+
+3. Step three (e.g., UI component)
+   Done when: component renders correctly in all states (loading, empty, error, populated) and its test passes
 
 ## Technical Notes
 Non-obvious decisions, edge cases to handle, performance considerations, or alternatives considered and rejected.
@@ -97,3 +102,4 @@ After writing the plan file, output:
 - **Exact paths.** File paths must be specific (e.g., `src/app/settings/invitations/page.tsx`), not vague descriptions.
 - **Respect existing patterns.** If the project uses Server Components for data fetching, the plan uses Server Components. Don't introduce new patterns unless the existing ones genuinely can't support this feature.
 - **Sequence respects dependencies.** Implementation order must reflect real chains — a UI component that calls a server action cannot be listed before the server action exists.
+- **Every step has a "Done when:" clause.** Verification criteria must be specific and runnable, not vague ("tests pass" is not enough; "pnpm test src/components/invitations/ passes with no failures" is).

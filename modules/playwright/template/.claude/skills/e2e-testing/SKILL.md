@@ -1,3 +1,8 @@
+---
+name: e2e-testing
+description: E2E testing with Playwright — file structure, test naming, locator priority (getByRole first), assertions, page object pattern, CI considerations
+---
+
 # E2E Testing with Playwright
 
 Guidance for writing and running Playwright tests in this project.

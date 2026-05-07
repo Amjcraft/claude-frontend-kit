@@ -1,3 +1,8 @@
+---
+name: vercel-deploy
+description: Vercel deployment — automatic deploy workflow, env var management via CLI, Vercel MCP usage, common build failure and env mismatch troubleshooting
+---
+
 # Vercel Deployment
 
 Guidance for managing deployments and environment configuration via Vercel.

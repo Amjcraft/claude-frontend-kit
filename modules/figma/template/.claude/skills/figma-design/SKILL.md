@@ -1,3 +1,8 @@
+---
+name: figma-design
+description: Figma design handoff — token mapping to Tailwind/CSS variables, component identification from Figma patterns, responsive behavior, handoff checklist
+---
+
 # Figma Design Handoff
 
 Guidance for translating Figma designs into code for this project.

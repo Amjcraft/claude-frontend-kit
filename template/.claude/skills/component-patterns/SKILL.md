@@ -1,4 +1,5 @@
 ---
+name: component-patterns
 description: React component patterns — compound components, cva variants for style/size, forwardRef for native element wrappers, hook extraction rules, cn() for class merging, prop drilling limits (max 2 levels)
 ---
 

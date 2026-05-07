@@ -80,6 +80,12 @@ Use these on demand when the task calls for it:
 - **shadcn** — shadcn/ui component reference and install commands
 - **github** *(user-scoped)* — PR and issue management
 
+## When to Delegate to a Subagent
+
+- **`code-explorer`** — any question that requires reading more than 5 files to understand; use `/investigate` as the shortcut
+- **`pr-reviewer`** — final pre-PR audit; use `/polish` to invoke it
+- Otherwise, stay in the main thread — subagents cost an extra round-trip and should earn their keep
+
 ## Agent Workflow
 
 This project uses a phased approach to keep each session context lean:
